@@ -1,10 +1,10 @@
 #pragma once
 
-enum class valueType {
+enum class ValueType {
 	string,
 	integer,
 	decimal,
 	boolean,
 	object,
-	array
+	vector,
 };
