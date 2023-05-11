@@ -20,6 +20,7 @@ class MyString {
 public:
 	MyString();
 	MyString(const char* data);
+	MyString(const char* data, size_t len);
 	MyString(const MyString& other);
 	MyString(MyString&& other);
 	MyString& operator=(const MyString& other);
@@ -30,6 +31,8 @@ public:
 	char& operator[](size_t index);
 	char operator[](size_t index) const;
 
+	bool isNumber() const;
+	int toNumber() const;
 	size_t length() const;
 	const char* c_str() const;
 	MyString substr(size_t begin, size_t howMany) const;

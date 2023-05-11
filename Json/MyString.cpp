@@ -105,6 +105,32 @@ MyString::MyString(const char* data) : MyString(strlen(data) + 1) {
 	strcpy(_data, data);
 }
 
+MyString::MyString(const char* data, size_t len) : MyString(len + 1){
+	if (data == nullptr) {
+		free();
+		throw std::invalid_argument("Nullptr passed instead of a string");
+	}
+	if(len > strlen(data)) {
+		free();
+		throw std::invalid_argument("invalid length");
+	}
+
+	_capacity = len;
+
+	if (isSmall()) {
+		for (size_t i = 0; i < len; i++)
+			_smallString[i] = data[i];
+
+		_smallString[len] = '\0';
+		return;
+	}
+
+	for (size_t i = 0; i < len; i++)
+		_data[i] = data[i];
+
+	_data[len] = '\0';
+}
+
 MyString::MyString(const MyString& other) {
 	copyFrom(other);
 }
@@ -239,3 +265,27 @@ std::istream& operator>>(std::istream& is, MyString& str) {
 	return is;
 }
 
+int MyString::toNumber() const {
+	if (!isNumber())
+		throw std::logic_error("not a number");
+
+	int result = 0;
+	int multiplier = 1;
+
+	for(size_t i = 0; i < length(); i++) {
+		result += (this->operator[](length() - 1 - i) - '0') * multiplier;
+		multiplier *= 10;
+	}
+	return result;
+}
+
+
+bool MyString::isNumber() const {
+	for(size_t i = 0; i < length(); i++) {
+		if(i == 0 && this->operator[](i) == '-')
+			continue;
+		if (this->operator[](i) < '0' || this->operator[](i) > '9')
+			return false;
+	}
+	return true;
+}

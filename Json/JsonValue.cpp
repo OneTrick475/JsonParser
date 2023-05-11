@@ -55,8 +55,17 @@ void JsonValue::moveFrom(JsonValue&& other) {
 		vector = other.vector;
 		other.vector = nullptr;
 	}
-	else {
+	else if(other.type == ValueType::decimal) {
 		decimal = other.decimal;
+		type = ValueType::decimal;
+	}
+	else if (other.type == ValueType::integer) {
+		integer = other.integer;
+		type = ValueType::integer;
+	}
+	else if (other.type == ValueType::boolean) {
+		boolean = other.boolean;
+		type = ValueType::boolean;
 	}
 }
 
