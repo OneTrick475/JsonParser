@@ -1,4 +1,6 @@
 #include "MyString.h"
+
+#include <string>
 #pragma warning(disable : 4996)
 
 //define used here and not in the .h to keep it only visible in this file and not anywhere .h is included
@@ -265,6 +267,18 @@ std::istream& operator>>(std::istream& is, MyString& str) {
 	return is;
 }
 
+void MyString::trim() {
+	size_t frontSpaces = 0;
+	while (this->operator[](frontSpaces) == ' ' || this->operator[](frontSpaces) == '\n')
+		frontSpaces++;
+	size_t backspaces = 0;
+	while (this->operator[](length() - 1 - backspaces) == ' ' || this->operator[](length() - 1 - backspaces) == '\n')
+		backspaces++;
+
+	this->operator=(MyString(&this->c_str()[frontSpaces], length() - frontSpaces - backspaces));
+}
+
+
 int MyString::toNumber() const {
 	if (!isNumber())
 		throw std::logic_error("not a number");
@@ -279,7 +293,6 @@ int MyString::toNumber() const {
 	return result;
 }
 
-
 bool MyString::isNumber() const {
 	for(size_t i = 0; i < length(); i++) {
 		if(i == 0 && this->operator[](i) == '-')
@@ -288,4 +301,11 @@ bool MyString::isNumber() const {
 			return false;
 	}
 	return true;
+}
+
+std::istream& getline(std::istream& is, MyString& string, char delim) {
+	char buffer[1024];
+	is.getline(buffer, 1024, delim);
+	string = buffer;
+	return is;
 }

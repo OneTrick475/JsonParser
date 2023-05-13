@@ -38,8 +38,19 @@ void JsonHashMap::put(const JsonPair& pair) {
 }
 
 std::ostream& operator<<(std::ostream& os, const JsonHashMap& map) {
+	os << '{' << '\n';
+
+	bool isFirst = true;
+
 	for(size_t i = 0; i < map.dataCapacity; i++) {
-		os << map.data[i];
+		if (!map.data[i].isEmpty()) {
+			if(!isFirst) {
+				os << ",\n";
+			}
+			os << map.data[i];
+			isFirst = false;
+		}
 	}
+	os << "\n }";
 	return os;
 }

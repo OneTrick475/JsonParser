@@ -31,6 +31,7 @@ public:
 	char& operator[](size_t index);
 	char operator[](size_t index) const;
 
+	void trim();
 	bool isNumber() const;
 	int toNumber() const;
 	size_t length() const;
@@ -45,3 +46,5 @@ MyString operator+(const MyString& lhs, const MyString& rhs);
 std::ostream& operator<<(std::ostream& os, const MyString& str);
 
 std::istream& operator>>(std::istream& os, const MyString& str);
+
+std::istream& getline(std::istream& is, MyString& string, char delim);

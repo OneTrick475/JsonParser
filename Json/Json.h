@@ -6,16 +6,20 @@ class Json {
 private:
 	JsonHashMap map;
 
-	void readValue(std::ifstream& file, JsonValue& value) const;
-	bool readKey(std::ifstream& file, MyString& str) const;
-	bool readPair(std::ifstream& file, JsonPair& pair) const;
-	void readObject(std::ifstream& file, JsonHashMap& object) const;
+	void readVector(std::istream& file, Vector<JsonValue>& vector) const;
+	void inputValue(std::istream& file, JsonValue& value, const MyString& buffer) const;
+	void readValue(std::istream& file, JsonValue& value) const;
+	bool readKey(std::istream& file, MyString& str) const;
+	bool readPair(std::istream& file, JsonPair& pair) const;
+	void readObject(std::istream& file, JsonHashMap& object) const;
 	
 public:
 	Json() = default;
 	Json(const MyString& fileName);
 
 	void parse(const MyString& fileName);
+
+	friend std::ostream& operator<<(std::ostream& os, const Json& json);
 };
 
 

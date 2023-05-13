@@ -42,8 +42,14 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, const LinkedList<T>& ll) {
 	typename LinkedList<T>::Node* temp = ll.head;
 
+	bool isFirst = true;
+
 	while(temp != nullptr) {
-		os << temp->value;
+		if(!isFirst) {
+			os << ",\n";
+		}
+		os << "    " << temp->value;
+		isFirst = false;
 		temp = temp->next;
 	}
 	return os;
@@ -156,6 +162,7 @@ template <typename T>
 bool LinkedList<T>::isEmpty() const {
 	return head == nullptr;
 }
+
 
 
 

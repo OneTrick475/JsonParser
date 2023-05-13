@@ -5,8 +5,14 @@
 #include "JsonHashMap.h"
 
 void JsonValue::free() {
-	if (type == ValueType::object || type == ValueType::string || type == ValueType::vector) {
+	if (type == ValueType::object) {
 		delete object;
+	}
+	else if(type == ValueType::vector) {
+		delete vector;
+	}
+	else if (type == ValueType::string) {
+		delete string;
 	}
 	object = nullptr;
 }
@@ -46,25 +52,31 @@ void JsonValue::moveFrom(JsonValue&& other) {
 	if (other.type == ValueType::object) {
 		object = other.object;
 		other.object = nullptr;
+		type = ValueType::object;
 	}
 	else if (other.type == ValueType::string) {
 		string = other.string;
 		other.string = nullptr;
+		type = ValueType::string;
 	}
 	else if (other.type == ValueType::vector) {
 		vector = other.vector;
 		other.vector = nullptr;
+		type = ValueType::vector;
 	}
 	else if(other.type == ValueType::decimal) {
 		decimal = other.decimal;
+		type = ValueType::decimal;
 		type = ValueType::decimal;
 	}
 	else if (other.type == ValueType::integer) {
 		integer = other.integer;
 		type = ValueType::integer;
+		type = ValueType::integer;
 	}
 	else if (other.type == ValueType::boolean) {
 		boolean = other.boolean;
+		type = ValueType::boolean;
 		type = ValueType::boolean;
 	}
 }
@@ -183,22 +195,22 @@ std::ostream& operator<<(std::ostream& os, const JsonValue& value) {
 	if (value.type == ValueType::object && value.object == nullptr) {
 		return os << "Null";
 	}
-	else if (value.type == ValueType::object) {
+	if (value.type == ValueType::object) {
 		return os << value.getObject();
 	}
-	else if (value.type == ValueType::string) {
-		return os << value.getString();
+	if (value.type == ValueType::string) {
+		return os << '"' << value.getString() << '"';
 	}
-	else if (value.type == ValueType::vector) {
+	if (value.type == ValueType::vector) {
 		return os;
 	}
-	else if (value.type == ValueType::decimal) {
+	if (value.type == ValueType::decimal) {
 		return os << value.getDecimal();
 	}
-	else if (value.type == ValueType::integer) {
+	if (value.type == ValueType::integer) {
 		return os << value.getInt();
 	}
-	else if (value.type == ValueType::boolean) {
-		return os << value.getBool();
+	if (value.type == ValueType::boolean) {
+		return os << std::boolalpha << value.getBool();
 	}
 }
