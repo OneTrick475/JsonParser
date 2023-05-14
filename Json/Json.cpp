@@ -128,3 +128,7 @@ bool Json::readPair(std::istream& file, JsonPair& pair) const {
 std::ostream& operator<<(std::ostream& os, const Json& json) {
 	return os << json.map;
 }
+
+void Json::print() const {
+	std::cout << map;
+}

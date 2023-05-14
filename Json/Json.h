@@ -17,6 +17,7 @@ public:
 	Json(const MyString& fileName);
 
 	void parse(const MyString& fileName);
+	void print() const;
 
 	friend std::ostream& operator<<(std::ostream& os, const Json& json);
 };

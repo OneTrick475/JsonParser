@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "IIterator.h"
 
 template <typename T>
 class LinkedList {
@@ -21,12 +22,27 @@ class LinkedList {
 	void moveFrom(LinkedList&& other);
 
 public:
+	class LinkedListIterator : public IIterator<T> {
+		Node* node = nullptr;
+	public:
+		LinkedListIterator(Node* node);
+		LinkedListIterator& operator++() override;
+		bool operator!=(const IIterator<T>& other) const override;
+		bool operator!=(const LinkedListIterator& other) const;
+		T& operator*() const override;
+
+		~LinkedListIterator() override = default;
+	};
+
 	LinkedList() = default;
 	LinkedList(const LinkedList& other);
 	LinkedList(LinkedList&& other);
 	LinkedList<T>& operator=(const LinkedList& other);
 	LinkedList<T>& operator=(LinkedList&& other);
 	~LinkedList();
+
+	LinkedListIterator begin() const;
+	LinkedListIterator end() const;
 
 	void add(const T& element);
 	void add(T&& element);
@@ -37,6 +53,42 @@ public:
 
 	friend class JsonHashMap;
 };
+
+template <typename T>
+LinkedList<T>::LinkedListIterator::LinkedListIterator(Node* node) : node(node) {}
+
+template <typename T>
+typename LinkedList<T>::LinkedListIterator& LinkedList<T>::LinkedListIterator::operator++() {
+	if (node != nullptr)
+		node = node->next;
+
+	return *this;
+}
+
+template <typename T>
+T& LinkedList<T>::LinkedListIterator::operator*() const {
+	return node->value;
+}
+
+template <typename T>
+bool LinkedList<T>::LinkedListIterator::operator!=(const IIterator<T>& other) const {
+	return other != *this;
+}
+
+template <typename T>
+bool LinkedList<T>::LinkedListIterator::operator!=(const LinkedListIterator& other) const {
+	return node != other.node;
+}
+
+template <typename T>
+typename LinkedList<T>::LinkedListIterator LinkedList<T>::begin() const {
+	return LinkedListIterator(head);
+}
+
+template <typename T>
+typename LinkedList<T>::LinkedListIterator LinkedList<T>::end() const {
+	return LinkedListIterator(nullptr);
+}
 
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const LinkedList<T>& ll) {
@@ -56,11 +108,11 @@ std::ostream& operator<<(std::ostream& os, const LinkedList<T>& ll) {
 }
 
 template<typename T>
-inline LinkedList<T>::Node::Node(const T& _value) {
+LinkedList<T>::Node::Node(const T& _value) {
 	value = _value;
 }
 template<typename T>
-inline LinkedList<T>::Node::Node(T&& _value) {
+LinkedList<T>::Node::Node(T&& _value) {
 	value = std::move(_value);
 }
 

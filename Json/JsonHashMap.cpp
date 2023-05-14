@@ -54,3 +54,49 @@ std::ostream& operator<<(std::ostream& os, const JsonHashMap& map) {
 	os << "\n }";
 	return os;
 }
+
+JsonHashMap::JsonIterator::JsonIterator(LinkedList<JsonPair>::LinkedListIterator iter, size_t linkedListIndex, const JsonHashMap* map) :
+																			iter(iter), linkedListIndex(linkedListIndex), map(map) {}
+
+JsonHashMap::JsonIterator JsonHashMap::begin() const {
+	for(size_t i = 0; i < dataCapacity; i++) {
+		if (!data[i].isEmpty()) 
+			return JsonIterator(data[i].begin(), i, this);
+	}
+	return end();
+}
+
+JsonHashMap::JsonIterator JsonHashMap::end() const {
+	return JsonIterator(nullptr, dataCapacity, nullptr);
+}
+
+
+JsonHashMap::JsonIterator& JsonHashMap::JsonIterator::operator++() {
+	if (++iter != map->data[linkedListIndex].end()) {
+		return *this;
+	}
+
+	while (linkedListIndex < map->dataCapacity - 1) {
+		linkedListIndex++;
+		if (!map->data[linkedListIndex].isEmpty()) {
+			iter = map->data[linkedListIndex].begin();
+			return *this;
+		}
+	}
+	
+	*this = map->end();
+	return *this;
+}
+
+JsonPair& JsonHashMap::JsonIterator::operator*() const {
+	return *iter;
+}
+
+bool JsonHashMap::JsonIterator::operator!=(const IIterator<JsonPair>& other) const {
+	return other != *this;
+}
+
+bool JsonHashMap::JsonIterator::operator!=(const JsonIterator& other) const {
+	return iter != other.iter;
+}
+
