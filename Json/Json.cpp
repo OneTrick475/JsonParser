@@ -35,57 +35,58 @@ void Json::readObject(std::istream& file, JsonHashMap& object) const {
 		JsonPair pair;
 		if (!readPair(file, pair))
 			break;
+		/*std::cout << pair << '\n';*/
 		object.put(pair);
 	}
 }
 
-bool Json::readKey(std::istream& file, MyString& str) const{
-	MyString buffer;
-	getline(file, buffer, ':');
+void Json::readKey(MyString& buffer, MyString& str) const{
+	std::stringstream ss(buffer.c_str());
+
+	MyString key;
+	getline(ss, key, ':');
+	getline(ss, buffer, '\n');
 
 	buffer.trim();
 
-	if (strcmp(buffer.c_str(), "}") == 0)
-		return false;
-
-	if (buffer[0] != '"')
+	if (key[0] != '"')
 		throw std::invalid_argument("Invalid Json file. A string did not start with \" ");
 
-	if (buffer[buffer.length() - 1] != '"')
+	if (key[key.length() - 1] != '"')
 		throw std::invalid_argument("Invalid Json file. A string did not end with \" ");
 
-	str = MyString(&buffer.c_str()[1], buffer.length() - 2); // we want to skip the first  "  and the  "  at the end
+	str = MyString(&key.c_str()[1], key.length() - 2); // we want to skip the first  "  and the  "  at the end
 
-	return true;
 }
 
 void Json::readVector(std::istream& file, Vector<JsonValue>& vector) const {
 	MyString buffer;
-	getline(file, buffer, ']');
-
-	std::stringstream ss(buffer.c_str());
-
-	getline(ss, buffer, ',');
-
-	size_t i = 0;
+	getline(file, buffer, '\n');
+	buffer.trim();
 
 	while(strcmp(buffer.c_str(), "]") != 0) {
-		inputValue(ss, vector[i++], buffer);
-		getline(ss, buffer, ',');
+		JsonValue value;
+		readValue(file, value, buffer);
+		vector.pushBack(value);
+		getline(file, buffer, '\n');
+		buffer.trim();
 	}
 }
 
-void Json::inputValue(std::istream& file, JsonValue& value, const MyString& buffer) const {
-	if (buffer.isNumber())
-		value.setValue(buffer.toNumber()); 
+void Json::readValue(std::istream& file, JsonValue& value, MyString& buffer) const {
+	if (buffer.c_str()[buffer.length() - 1] == ',')
+		buffer = MyString(buffer.c_str(), buffer.length() - 1);
 
-	else if (strcmp(buffer.c_str(), "{") == 0) {
+	if (buffer.isNumber())
+		value.setValue(buffer.toNumber());
+
+	else if (buffer[0] == '{') {
 		JsonHashMap object;
 		readObject(file, object);
 		value.setValue(object);
 	}
 
-	else if (strcmp(buffer.c_str(), "[") == 0) {
+	else if (buffer[0] == '[') {
 		Vector<JsonValue> vector;
 		readVector(file, vector);
 		value.setValue(vector);
@@ -104,24 +105,20 @@ void Json::inputValue(std::istream& file, JsonValue& value, const MyString& buff
 		throw std::runtime_error("Invalid Json file.");
 }
 
-
-void Json::readValue(std::istream& file, JsonValue& value) const {
+bool Json::readPair(std::istream& file, JsonPair& pair) const {
 	MyString buffer;
-
-	getline(file, buffer, ',');
-
+	getline(file, buffer, '\n');
 	buffer.trim();
 
-	inputValue(file, value, buffer);
-}
-
-bool Json::readPair(std::istream& file, JsonPair& pair) const {
-	MyString key;
-	if (!readKey(file, key))
+	if (strcmp(buffer.c_str(), "}") == 0 || strcmp(buffer.c_str(), "},") == 0)
 		return false;
 
+	MyString key;
+	readKey(buffer, key); // takes the key out of buffer
+
+	buffer.trim();
 	JsonValue value;
-	readValue(file, value);
+	readValue(file, value, buffer);
 
 	pair = JsonPair(key, value);
 

@@ -7,9 +7,8 @@ private:
 	JsonHashMap map;
 
 	void readVector(std::istream& file, Vector<JsonValue>& vector) const;
-	void inputValue(std::istream& file, JsonValue& value, const MyString& buffer) const;
-	void readValue(std::istream& file, JsonValue& value) const;
-	bool readKey(std::istream& file, MyString& str) const;
+	void readValue(std::istream& file, JsonValue& value, MyString& buffer) const;
+	void readKey(MyString& buffer, MyString& str) const;
 	bool readPair(std::istream& file, JsonPair& pair) const;
 	void readObject(std::istream& file, JsonHashMap& object) const;
 	

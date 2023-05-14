@@ -4,7 +4,7 @@
 #include "LinkedList.h"
 #include <iostream>
 
-JsonHashMap::JsonHashMap() : data(dataCapacity) {}
+JsonHashMap::JsonHashMap() : data(JsonHashMapConstants::initialVectorLen) {}
 
 JsonHashMap::JsonHashMap(size_t dataCapacity) : dataCapacity(dataCapacity), data(dataCapacity) {}
 

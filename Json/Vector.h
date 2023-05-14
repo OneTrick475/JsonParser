@@ -34,6 +34,9 @@ public:
 
 	T& operator[](size_t index);
 	const T& operator[](size_t index) const;
+
+	template<typename T>
+	friend std::ostream& operator<<(std::ostream& os, const Vector<T>& vector);
 };
 
 
@@ -41,7 +44,7 @@ template <typename T>
 void Vector<T>::free() {
 	delete[] data;
 	data = nullptr;
-	count = 0;
+	count = length = 0;
 }
 
 template <typename T>
@@ -50,9 +53,10 @@ void Vector<T>::copyFrom(const Vector& other) {
 
 	data = new T[length];
 
-	for (size_t i = 0; i < other.count; i++) {
+	for (size_t i = 0; i < other.length; i++) {
 		data[i] = other.data[i];
 	}
+	count = other.count;
 }
 
 template <typename T>
@@ -69,7 +73,7 @@ Vector<T>::Vector(size_t initialLength) : length(initialLength) {
 }
 
 template<typename T>
-Vector<T>::Vector() : Vector(length) {}
+Vector<T>::Vector() : Vector(vectorConstants::initialLength) {}
 
 template<typename T>
 Vector<T>::Vector(const Vector& other) {
@@ -159,6 +163,21 @@ const T& Vector<T>::operator[](size_t index) const {
 	return data[index];
 }
 
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const Vector<T>& vector) {
+	os << "[\n";
+
+	bool isFirst = true;
+
+	for(size_t i = 0; i < vector.count; i++) {
+		if (!isFirst) {
+			os << ",\n";
+		}
+		os << "    " << vector[i];
+		isFirst = false;
+	}
+	return os << "\n]";
+}
 
 
 

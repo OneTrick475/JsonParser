@@ -144,7 +144,7 @@ void LinkedList<T>::copyFrom(const LinkedList& other) {
 	Node* tempOther = other.head->next;
 
 	while (tempOther != nullptr) {
-		tail->next = tempOther;
+		tail->next = new Node(tempOther->value);
 		tail = tail->next;
 		tempOther = tempOther->next;
 	}

@@ -14,6 +14,7 @@ void JsonValue::free() {
 	else if (type == ValueType::string) {
 		delete string;
 	}
+	type = ValueType::object;
 	object = nullptr;
 }
 
@@ -67,16 +68,13 @@ void JsonValue::moveFrom(JsonValue&& other) {
 	else if(other.type == ValueType::decimal) {
 		decimal = other.decimal;
 		type = ValueType::decimal;
-		type = ValueType::decimal;
 	}
 	else if (other.type == ValueType::integer) {
 		integer = other.integer;
 		type = ValueType::integer;
-		type = ValueType::integer;
 	}
 	else if (other.type == ValueType::boolean) {
 		boolean = other.boolean;
-		type = ValueType::boolean;
 		type = ValueType::boolean;
 	}
 }
@@ -202,7 +200,7 @@ std::ostream& operator<<(std::ostream& os, const JsonValue& value) {
 		return os << '"' << value.getString() << '"';
 	}
 	if (value.type == ValueType::vector) {
-		return os;
+		return os << value.getVector();
 	}
 	if (value.type == ValueType::decimal) {
 		return os << value.getDecimal();
