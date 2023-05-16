@@ -41,6 +41,9 @@ public:
 	friend MyString operator+(const MyString& lhs, const MyString& rhs);
 	friend std::istream& operator>>(std::istream&, MyString& str);
 };
+
+bool operator==(const MyString& lhs, const MyString& rhs);
+
 MyString operator+(const MyString& lhs, const MyString& rhs);
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);

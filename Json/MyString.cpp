@@ -269,10 +269,11 @@ std::istream& operator>>(std::istream& is, MyString& str) {
 
 void MyString::trim() {
 	size_t frontSpaces = 0;
-	while (this->operator[](frontSpaces) == ' ' || this->operator[](frontSpaces) == '\n')
+	while (this->operator[](frontSpaces) == ' ' || this->operator[](frontSpaces) == '\n' || this->operator[](frontSpaces) == '\t')
 		frontSpaces++;
 	size_t backspaces = 0;
-	while (this->operator[](length() - 1 - backspaces) == ' ' || this->operator[](length() - 1 - backspaces) == '\n')
+	while (this->operator[](length() - 1 - backspaces) == ' ' || this->operator[](length() - 1 - backspaces) == '\n' ||
+		this->operator[](length() - 1 - backspaces) == '\t')
 		backspaces++;
 
 	this->operator=(MyString(&this->c_str()[frontSpaces], length() - frontSpaces - backspaces));
@@ -308,4 +309,8 @@ std::istream& getline(std::istream& is, MyString& string, char delim) {
 	is.getline(buffer, 1024, delim);
 	string = buffer;
 	return is;
+}
+
+bool operator==(const MyString& lhs, const MyString& rhs) {
+	return strcmp(lhs.c_str(), rhs.c_str()) == 0;
 }

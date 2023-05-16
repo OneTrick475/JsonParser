@@ -1,7 +1,7 @@
 #include "JsonValue.h"
 #include <iostream>
 #include "ValueType.h"
-#include "Vector.h"
+#include "Vector.hpp"
 #include "JsonHashMap.h"
 
 void JsonValue::free() {
@@ -194,13 +194,41 @@ std::ostream& operator<<(std::ostream& os, const JsonValue& value) {
 		return os << "Null";
 	}
 	if (value.type == ValueType::object) {
-		return os << value.getObject();
+		const JsonHashMap& map = value.getObject();
+
+		os << '{' << '\n';
+
+		bool isFirst = true;
+
+		for (JsonHashMap::JsonIterator it = map.begin(); it != map.end(); ++it) {
+			if (!isFirst) {
+				os << ",\n";
+			}
+			os << *it;
+			isFirst = false;
+		}
+		os << "\n }";
+		return os;
 	}
 	if (value.type == ValueType::string) {
 		return os << '"' << value.getString() << '"';
 	}
 	if (value.type == ValueType::vector) {
-		return os << value.getVector();
+		Vector<JsonValue> values = value.getVector();
+
+		bool isFirst = true;
+
+		os << "[";
+		for(size_t i = 0; i < values.len(); i++) {
+			if(!isFirst) 
+				os << ",\n" << values[i];
+			
+			else {
+				os << "\n" << values[i];
+				isFirst = false;
+			}
+		}
+		return os << "\n";
 	}
 	if (value.type == ValueType::decimal) {
 		return os << value.getDecimal();

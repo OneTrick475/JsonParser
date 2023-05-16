@@ -28,6 +28,10 @@ void Json::parse(const MyString& fileName) {
 		throw std::invalid_argument("Invalid Json file. Does not start with a '{' ");
 
 	readObject(file, map);
+
+	file.close();
+
+	currentFile = fileName;
 }
 
 void Json::readObject(std::istream& file, JsonHashMap& object) const {
@@ -35,7 +39,6 @@ void Json::readObject(std::istream& file, JsonHashMap& object) const {
 		JsonPair pair;
 		if (!readPair(file, pair))
 			break;
-		/*std::cout << pair << '\n';*/
 		object.put(pair);
 	}
 }
@@ -126,9 +129,30 @@ bool Json::readPair(std::istream& file, JsonPair& pair) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Json& json) {
-	return os << json.map;
+	os << '{' << '\n';
+
+	bool isFirst = true;
+
+	for (JsonHashMap::JsonIterator it = json.map.begin(); it != json.map.end(); ++it) {
+		if (!isFirst) {
+			os << ",\n";
+		}
+		os << "  " << *it;
+		isFirst = false;
+	}
+	os << "\n }";
+	return os;
 }
 
 void Json::print() const {
-	std::cout << map;
+	std::cout << *this;
+}
+
+void Json::save(const MyString& path) const {
+	std::ofstream file(currentFile.c_str());
+
+	if (!file.is_open())
+		throw std::runtime_error("couldnt open file");
+
+	file << *this;
 }

@@ -1,7 +1,7 @@
 #include "JsonHashMap.h"
-#include "Vector.h"
+#include "Vector.hpp"
 #include "JsonPair.h"
-#include "LinkedList.h"
+#include "LinkedList.hpp"
 #include <iostream>
 
 JsonHashMap::JsonHashMap() : data(JsonHashMapConstants::initialVectorLen) {}
@@ -35,24 +35,6 @@ void JsonHashMap::put(const JsonPair& pair) {
 		temp = temp->next;
 	}
 	data[index].add(pair);
-}
-
-std::ostream& operator<<(std::ostream& os, const JsonHashMap& map) {
-	os << '{' << '\n';
-
-	bool isFirst = true;
-
-	for(size_t i = 0; i < map.dataCapacity; i++) {
-		if (!map.data[i].isEmpty()) {
-			if(!isFirst) {
-				os << ",\n";
-			}
-			os << map.data[i];
-			isFirst = false;
-		}
-	}
-	os << "\n }";
-	return os;
 }
 
 JsonHashMap::JsonIterator::JsonIterator(LinkedList<JsonPair>::LinkedListIterator iter, size_t linkedListIndex, const JsonHashMap* map) :

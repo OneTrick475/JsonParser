@@ -1,7 +1,7 @@
 #pragma once
-#include "Vector.h"
+#include "Vector.hpp"
 #include "JsonPair.h"
-#include "LinkedList.h"
+#include "LinkedList.hpp"
 #include "MyString.h"
 
 namespace JsonHashMapConstants {
@@ -37,6 +37,4 @@ public:
 	JsonIterator end() const;
 
 	void put(const JsonPair& pair);
-
-	friend std::ostream& operator<<(std::ostream& os, const JsonHashMap& map);
 };
