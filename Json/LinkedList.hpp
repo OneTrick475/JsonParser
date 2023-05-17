@@ -47,6 +47,7 @@ public:
 	void add(const T& element);
 	void add(T&& element);
 	bool isEmpty() const;
+	void remove(const T& element);
 
 	template<typename T>
 	friend std::ostream& operator<<(std::ostream& os, const LinkedList<T>& ll);
@@ -207,6 +208,31 @@ void LinkedList<T>::moveFrom(LinkedList&& other) {
 template <typename T>
 bool LinkedList<T>::isEmpty() const {
 	return head == nullptr;
+}
+
+
+template <typename T>
+void LinkedList<T>::remove(const T& element) {
+	if (isEmpty())
+		return;
+
+	Node* temp = head;
+
+	if (head->value == element) {
+		head = head->next;
+		delete temp;
+		return;
+	}
+
+	while (temp->next != nullptr) {
+		if (temp->next->value == element) {
+			Node* tempNext = temp->next;
+			temp->next = temp->next->next;
+			delete tempNext;
+			return;
+		}
+		temp = temp->next;
+	}
 }
 
 

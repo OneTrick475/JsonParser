@@ -1,17 +1,18 @@
 #pragma once
-#include "JsonHashMap.h"
+#include "HashMap.hpp"
 #include "MyString.h"
+#include "JsonValue.h"
 
 class Json {
 private:
-	JsonHashMap map;
+	HashMap<MyString, JsonValue, hash> map;
 	MyString currentFile;
 
 	void readVector(std::istream& file, Vector<JsonValue>& vector) const;
 	void readValue(std::istream& file, JsonValue& value, MyString& buffer) const;
 	void readKey(MyString& buffer, MyString& str) const;
-	bool readPair(std::istream& file, JsonPair& pair) const;
-	void readObject(std::istream& file, JsonHashMap& object) const;
+	bool readPair(std::istream& file, MyString& str, JsonValue& value) const;
+	void readObject(std::istream& file, HashMap<MyString, JsonValue, hash>& object) const;
 	
 public:
 	Json() = default;
@@ -23,7 +24,6 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, const Json& json);
 };
-
 
 
 

@@ -51,3 +51,7 @@ std::ostream& operator<<(std::ostream& os, const MyString& str);
 std::istream& operator>>(std::istream& os, const MyString& str);
 
 std::istream& getline(std::istream& is, MyString& string, char delim);
+
+struct hash {
+	size_t operator()(const MyString& str) const;
+};

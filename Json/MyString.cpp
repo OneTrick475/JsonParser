@@ -314,3 +314,13 @@ std::istream& getline(std::istream& is, MyString& string, char delim) {
 bool operator==(const MyString& lhs, const MyString& rhs) {
 	return strcmp(lhs.c_str(), rhs.c_str()) == 0;
 }
+
+
+size_t hash::operator()(const MyString& str) const {
+	size_t index = -1; //this is done to set it to the max value
+
+	for (size_t i = 0; i < str.length(); i++)
+		index -= str[i];
+
+	return index;
+}

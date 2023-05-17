@@ -16,6 +16,7 @@ public:
 		valueType value;
 		Pair() = default;
 		Pair(keyType key, valueType value);
+		bool operator==(const Pair& other);
 	};
 private:
 	size_t dataCapacity = HashMapConstants::initialVectorLen;
@@ -45,6 +46,8 @@ public:
 	MapIterator end() const;
 
 	void put(keyType key, valueType value);
+	const valueType& get(const keyType& key) const;
+	void remove(const keyType& key);
 };
 
 
@@ -115,7 +118,7 @@ typename HashMap<keyType, valueType, hashFunc>::MapIterator HashMap<keyType, val
 
 template<typename keyType, typename valueType, typename hashFunc>
 void HashMap<keyType, valueType, hashFunc>::put(keyType key, valueType value) {
-	size_t index = (hash(key) % dataCapacity);
+	size_t index = hash(key) % dataCapacity;
 
 	if (data[index].isEmpty()) {
 		data[index].add(Pair(key, value));
@@ -132,5 +135,40 @@ void HashMap<keyType, valueType, hashFunc>::put(keyType key, valueType value) {
 
 	data[index].add(Pair(key, value));
 }
+
+
+template <typename keyType, typename valueType, typename hashFunc>
+const valueType& HashMap<keyType, valueType, hashFunc>::get(const keyType& key) const {
+	size_t index = hash(key) % dataCapacity;
+
+	for(typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
+		Pair& pair = *it;
+		if (pair.key == key)
+			return pair.value;
+	}
+	throw std::runtime_error("element doesnt exist");
+}
+
+
+template <typename keyType, typename valueType, typename hashFunc>
+void HashMap<keyType, valueType, hashFunc>::remove(const keyType& key) {
+	size_t index = hash(key) % dataCapacity;
+
+	for (typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
+		Pair& pair = *it;
+		if (pair.key == key) {
+			data[index].remove(pair);
+			return;
+		}
+	}
+}
+
+
+template <typename keyType, typename valueType, typename hashFunc>
+bool HashMap<keyType, valueType, hashFunc>::Pair::operator==(const Pair& other) {
+	return key == other.key;
+}
+
+
 
 

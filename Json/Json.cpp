@@ -1,18 +1,16 @@
 #include "Json.h"
-#include "JsonHashMap.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
 #include "MyString.h"
+#include "JsonValue.h"
+#include "HashMap.hpp"
 
 Json::Json(const MyString& fileName) {
 	parse(fileName);
 }
 
 void Json::parse(const MyString& fileName) {
-	map = JsonHashMap();
-
 	std::ifstream file(fileName.c_str());
 
 	if (!file.is_open())
@@ -34,12 +32,13 @@ void Json::parse(const MyString& fileName) {
 	currentFile = fileName;
 }
 
-void Json::readObject(std::istream& file, JsonHashMap& object) const {
+void Json::readObject(std::istream& file, HashMap<MyString, JsonValue, hash>& object) const {
 	while(true) {
-		JsonPair pair;
-		if (!readPair(file, pair))
+		MyString key;
+		JsonValue value;
+		if (!readPair(file, key, value))
 			break;
-		object.put(pair);
+		object.put(key, value);
 	}
 }
 
@@ -84,7 +83,7 @@ void Json::readValue(std::istream& file, JsonValue& value, MyString& buffer) con
 		value.setValue(buffer.toNumber());
 
 	else if (buffer[0] == '{') {
-		JsonHashMap object;
+		HashMap<MyString, JsonValue, hash> object;
 		readObject(file, object);
 		value.setValue(object);
 	}
@@ -108,7 +107,7 @@ void Json::readValue(std::istream& file, JsonValue& value, MyString& buffer) con
 		throw std::runtime_error("Invalid Json file.");
 }
 
-bool Json::readPair(std::istream& file, JsonPair& pair) const {
+bool Json::readPair(std::istream& file, MyString& key, JsonValue& value) const {
 	MyString buffer;
 	getline(file, buffer, '\n');
 	buffer.trim();
@@ -116,14 +115,10 @@ bool Json::readPair(std::istream& file, JsonPair& pair) const {
 	if (strcmp(buffer.c_str(), "}") == 0 || strcmp(buffer.c_str(), "},") == 0)
 		return false;
 
-	MyString key;
 	readKey(buffer, key); // takes the key out of buffer
 
 	buffer.trim();
-	JsonValue value;
 	readValue(file, value, buffer);
-
-	pair = JsonPair(key, value);
 
 	return true;
 }
@@ -133,11 +128,11 @@ std::ostream& operator<<(std::ostream& os, const Json& json) {
 
 	bool isFirst = true;
 
-	for (JsonHashMap::JsonIterator it = json.map.begin(); it != json.map.end(); ++it) {
+	for (HashMap<MyString, JsonValue, hash>::MapIterator it = json.map.begin(); it != json.map.end(); ++it) {
 		if (!isFirst) {
 			os << ",\n";
 		}
-		os << "  " << *it;
+		os << (*it).key << ": " << (*it).value;
 		isFirst = false;
 	}
 	os << "\n }";
@@ -156,3 +151,4 @@ void Json::save(const MyString& path) const {
 
 	file << *this;
 }
+

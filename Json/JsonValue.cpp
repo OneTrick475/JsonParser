@@ -24,7 +24,7 @@ void JsonValue::copyFrom(const JsonValue& other) {
 		type = ValueType::object;
 	}
 	else if(other.type == ValueType::object) {
-		object = new JsonHashMap(*other.object);
+		object = new HashMap<MyString, JsonValue, hash>(*other.object);
 		type = ValueType::object;
 	}
 	else if (other.type == ValueType::string) {
@@ -141,7 +141,7 @@ double JsonValue::getDecimal() const {
 	return decimal;
 }
 
-const JsonHashMap& JsonValue::getObject() const {
+const HashMap<MyString, JsonValue, hash>& JsonValue::getObject() const {
 	if (type != ValueType::object)
 		throw std::logic_error("the value is not an object");
 	return *object;
@@ -177,10 +177,10 @@ void JsonValue::setValue(double _value) {
 	decimal = _value;
 }
 
-void JsonValue::setValue(const JsonHashMap& _value) {
+void JsonValue::setValue(const HashMap<MyString, JsonValue, hash>& _value) {
 	free();
 	type = ValueType::object;
-	object = new JsonHashMap(_value);
+	object = new HashMap<MyString, JsonValue, hash>(_value);
 }
 
 void JsonValue::setValue(const Vector<JsonValue>& _value) {
@@ -194,17 +194,17 @@ std::ostream& operator<<(std::ostream& os, const JsonValue& value) {
 		return os << "Null";
 	}
 	if (value.type == ValueType::object) {
-		const JsonHashMap& map = value.getObject();
+		const HashMap<MyString, JsonValue, hash>& map = value.getObject();
 
 		os << '{' << '\n';
 
 		bool isFirst = true;
 
-		for (JsonHashMap::JsonIterator it = map.begin(); it != map.end(); ++it) {
+		for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
 			if (!isFirst) {
 				os << ",\n";
 			}
-			os << *it;
+			os << (*it).key << ": " << (* it).value;
 			isFirst = false;
 		}
 		os << "\n }";
@@ -228,7 +228,7 @@ std::ostream& operator<<(std::ostream& os, const JsonValue& value) {
 				isFirst = false;
 			}
 		}
-		return os << "\n";
+		return os << "\n]";
 	}
 	if (value.type == ValueType::decimal) {
 		return os << value.getDecimal();
@@ -240,3 +240,6 @@ std::ostream& operator<<(std::ostream& os, const JsonValue& value) {
 		return os << std::boolalpha << value.getBool();
 	}
 }
+
+
+

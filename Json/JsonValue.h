@@ -2,17 +2,18 @@
 #include "MyString.h"
 #include "Vector.hpp"
 #include "ValueType.h"
+#include "HashMap.hpp"
 
 class JsonHashMap;
 
 class JsonValue {
 	ValueType type = ValueType::object;
-	union {
+	union { 
 		int integer;
 		double decimal;
 		bool boolean;
 		MyString* string;
-		JsonHashMap* object = nullptr;
+		HashMap<MyString, JsonValue, hash>* object = nullptr;
 		Vector<JsonValue>* vector;
 	};
 
@@ -35,14 +36,14 @@ public:
 	const MyString& getString() const;
 	bool getBool() const;
 	double getDecimal() const;
-	const JsonHashMap& getObject() const;
+	const HashMap<MyString, JsonValue, hash>& getObject() const;
 	const Vector<JsonValue>& getVector() const;
 
 	void setValue(int _value);
 	void setValue(const MyString& _value);
 	void setValue(bool _value);
 	void setValue(double _value);
-	void setValue(const JsonHashMap& _value);
+	void setValue(const HashMap<MyString, JsonValue, hash>& _value);
 	void setValue(const Vector<JsonValue>& _value);
 
 	void write(std::ofstream& os, size_t indent = 4) const;
