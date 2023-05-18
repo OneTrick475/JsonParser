@@ -31,6 +31,7 @@ public:
 	void pushBack(const T& element);
 	void pushBack(T&& element);
 	void pushAt(const T& element, size_t index);
+	void pushAt(T&& element, size_t index);
 
 	T& operator[](size_t index);
 	const T& operator[](size_t index) const;
@@ -150,6 +151,18 @@ void Vector<T>::pushAt(const T& element, size_t index) {
 		data[i] = data[i - 1];
 
 	data[index] = element;
+	count++;
+}
+
+template <typename T>
+void Vector<T>::pushAt(T&& element, size_t index) {
+	if (count == length)
+		resize();
+
+	for (size_t i = count; i > index; i--)
+		data[i] = data[i - 1];
+
+	data[index] = std::move(element);
 	count++;
 }
 
