@@ -132,8 +132,7 @@ std::ostream& operator<<(std::ostream& os, const Json& json) {
 		if (!isFirst) {
 			os << ",\n";
 		}
-		os <<  "  " << (*it).key << ": ";
-		(*it).value.write(os);
+		os << (*it).key << ": " << (*it).value;
 		isFirst = false;
 	}
 	os << "\n }";

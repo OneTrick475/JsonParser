@@ -4,6 +4,8 @@
 #include "ValueType.h"
 #include "HashMap.hpp"
 
+class JsonHashMap;
+
 class JsonValue {
 	ValueType type = ValueType::object;
 	union { 
@@ -19,8 +21,6 @@ class JsonValue {
 	void moveFrom(JsonValue&& other);
 	void free();
 
-	void indent(std::ostream& os, size_t number) const;
-
 public:
 	JsonValue();
 	JsonValue(const JsonValue& other);
@@ -32,33 +32,12 @@ public:
 	ValueType getType() const;
 	void setType(ValueType type);
 
-	template <typename T>
-	T getValue() const;
-
-	template<>
-	int getValue() const;
-
-	template<>
-	double getValue() const;
-
-	template<>
-	bool getValue() const;
-
-	template<>
-	Vector<JsonValue> getValue() const;
-
-	template<>
-	HashMap<MyString, JsonValue, hash> getValue() const;
-
-	template<>
-	MyString getValue() const;
-
-	/*int getInt() const;
+	int getInt() const;
 	const MyString& getString() const;
 	bool getBool() const;
 	double getDecimal() const;
 	const HashMap<MyString, JsonValue, hash>& getObject() const;
-	const Vector<JsonValue>& getVector() const;*/
+	const Vector<JsonValue>& getVector() const;
 
 	void setValue(int _value);
 	void setValue(const MyString& _value);
@@ -67,12 +46,8 @@ public:
 	void setValue(const HashMap<MyString, JsonValue, hash>& _value);
 	void setValue(const Vector<JsonValue>& _value);
 
-	void write(std::ostream& os, size_t indent = 4) const;
+	void write(std::ofstream& os, size_t indent = 4) const;
 	friend std::ostream& operator<<(std::ostream& os, const JsonValue& value);
 };
 
-template <typename T>
-T JsonValue::getValue() const {
-	throw std::logic_error("invalid value");
-}
 
