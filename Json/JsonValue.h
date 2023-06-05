@@ -53,19 +53,15 @@ public:
 	template<>
 	MyString getValue() const;
 
-	/*int getInt() const;
-	const MyString& getString() const;
-	bool getBool() const;
-	double getDecimal() const;
-	const HashMap<MyString, JsonValue, hash>& getObject() const;
-	const Vector<JsonValue>& getVector() const;*/
-
 	void setValue(int _value);
 	void setValue(const MyString& _value);
 	void setValue(bool _value);
 	void setValue(double _value);
 	void setValue(const HashMap<MyString, JsonValue, hash>& _value);
 	void setValue(const Vector<JsonValue>& _value);
+
+	void search(const MyString& key) const;
+	void set(const MyString& path, const JsonValue& value);
 
 	void write(std::ostream& os, size_t indent = 4) const;
 	friend std::ostream& operator<<(std::ostream& os, const JsonValue& value);

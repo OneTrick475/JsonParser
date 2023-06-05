@@ -117,42 +117,6 @@ void JsonValue::setType(ValueType _type) {
 	type = _type;
 }
 
-//int JsonValue::getInt() const {
-//	if(type != ValueType::integer)
-//		throw std::logic_error("the value is not an int");
-//	return integer;
-//}
-//
-//const MyString& JsonValue::getString() const {
-//	if (type != ValueType::string)
-//		throw std::logic_error("the value is not a string");
-//	return *string;
-//}
-//
-//bool JsonValue::getBool() const {
-//	if (type != ValueType::boolean)
-//		throw std::logic_error("the value is not a bool");
-//	return boolean;
-//}
-//
-//double JsonValue::getDecimal() const {
-//	if (type != ValueType::decimal)
-//		throw std::logic_error("the value is not a double");
-//	return decimal;
-//}
-//
-//const HashMap<MyString, JsonValue, hash>& JsonValue::getObject() const {
-//	if (type != ValueType::object)
-//		throw std::logic_error("the value is not an object");
-//	return *object;
-//}
-//
-//const Vector<JsonValue>& JsonValue::getVector() const {
-//	if (type != ValueType::vector)
-//		throw std::logic_error("the value is not a vector");
-//	return *vector;
-//}
-
 void JsonValue::setValue(int _value) {
 	free();
 	type = ValueType::integer;
@@ -252,58 +216,6 @@ void JsonValue::write(std::ostream& os, size_t _indent) const {
 	}
 }
 
-//std::ostream& operator<<(std::ostream& os, const JsonValue& value) {
-//	if (value.type == ValueType::object && value.object == nullptr) {
-//		return os << "Null";
-//	}
-//	if (value.type == ValueType::object) {
-//		const HashMap<MyString, JsonValue, hash>& map = value.getValue<HashMap<MyString, JsonValue, hash>>();
-//
-//		os << '{' << '\n';
-//
-//		bool isFirst = true;
-//
-//		for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
-//			if (!isFirst) {
-//				os << ",\n";
-//			}
-//			os << (*it).key << ": " << (* it).value;
-//			isFirst = false;
-//		}
-//		os << "\n }";
-//		return os;
-//	}
-//	if (value.type == ValueType::string) {
-//		return os << '"' << value.getValue<MyString>() << '"';
-//	}
-//	if (value.type == ValueType::vector) {
-//		Vector<JsonValue> values = value.getValue<Vector<JsonValue>>();
-//
-//		bool isFirst = true;
-//
-//		os << "[";
-//		for(size_t i = 0; i < values.len(); i++) {
-//			if(!isFirst) 
-//				os << ",\n" << values[i];
-//			
-//			else {
-//				os << "\n" << values[i];
-//				isFirst = false;
-//			}
-//		}
-//		return os << "\n]";
-//	}
-//	if (value.type == ValueType::decimal) {
-//		return os << value.getValue<double>();
-//	}
-//	if (value.type == ValueType::integer) {
-//		return os << value.getValue<int>();
-//	}
-//	if (value.type == ValueType::boolean) {
-//		return os << std::boolalpha << value.getValue<bool>();
-//	}
-//}
-
 template <>
 int JsonValue::getValue<int>() const {
 	return integer;
@@ -334,3 +246,52 @@ Vector<JsonValue> JsonValue::getValue<Vector<JsonValue>>() const {
 	return *vector;
 }
 
+void JsonValue::search(const MyString& key) const {
+	if(type == ValueType::object) {
+		HashMap<MyString, JsonValue, hash> map = getValue<HashMap<MyString, JsonValue, hash>>();
+
+		for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
+			if ((*it).key == key) {
+				(*it).value.write(std::cout);
+				std::cout << '\n';
+			}
+			(*it).value.search(key);
+		}
+	}
+	else if(type == ValueType::vector) {
+		Vector<JsonValue> values = getValue<Vector<JsonValue>>();
+
+		if (values.len() == 0 || values[0].getType() != ValueType::object)
+			return;
+
+		for(size_t i = 0; i < values.len(); i++) {
+			values[i].search(key);
+		}
+	}
+}
+
+void JsonValue::set(const MyString& path, const JsonValue& value) {
+	if (type == ValueType::object) {
+
+		size_t i = 0;
+		while (i < path.length() && path[i] != '/')
+			i++;
+
+		if (i == path.length()) {
+			for (HashMap<MyString, JsonValue, hash>::MapIterator it = (*object).begin(); it != (*object).end(); ++it) {
+				if ((*it).key == path) {
+					(*it).value = value;
+					return;
+				}
+			}
+			throw std::invalid_argument("Invalid path");
+		}
+		for (HashMap<MyString, JsonValue, hash>::MapIterator it = (*object).begin(); it != (*object).end(); ++it) {
+			if ((*it).key == path.substr(0, i)) {
+				(*it).value.set(&path.c_str()[i + 1], value);
+				return;
+			}
+		}
+	}
+	throw std::invalid_argument("Invalid path");
+}

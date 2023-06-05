@@ -136,7 +136,7 @@ std::ostream& operator<<(std::ostream& os, const Json& json) {
 		(*it).value.write(os);
 		isFirst = false;
 	}
-	os << "\n }";
+	os << "\n}";
 	return os;
 }
 
@@ -151,5 +151,55 @@ void Json::save(const MyString& path) const {
 		throw std::runtime_error("couldnt open file");
 
 	file << *this;
+}
+
+void Json::search(const MyString& key) const {
+	std::cout << "[\n";
+	for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
+		if ((*it).key == key) {
+			(*it).value.write(std::cout);
+			std::cout << '\n';
+		}
+		(*it).value.search(key);
+	}
+	std::cout << "]";
+}
+
+void Json::find(const MyString& key) const {
+	for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
+		if ((*it).key == key) {
+			std::cout << (*it).key << " : ";
+			(*it).value.write(std::cout);
+			std::cout << '\n';
+		}
+	}
+}
+
+void Json::set(const MyString& path, const MyString& value) {
+	JsonValue val;
+	MyString buffer;
+	std::stringstream ss(value.c_str());
+	getline(ss, buffer, '\n');
+	readValue(ss, val, buffer);
+
+	size_t i = 0;
+	while (i < path.length() && path[i] != '/')
+		i++;
+	if(i == path.length()) {
+		for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
+			if ((*it).key == path) {
+				(*it).value = val;
+				return;
+			}
+		}
+		throw std::invalid_argument("Invalid path");
+	}
+	for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
+		if ((*it).key == path.substr(0, i)) {
+			(*it).value.set(&path.c_str()[i+1], val);
+			return;
+		}
+	}
+	throw std::invalid_argument("Invalid path");
 }
 
