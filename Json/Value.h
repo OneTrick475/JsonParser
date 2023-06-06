@@ -17,9 +17,12 @@ public:
 	virtual void setValue(const Vector<PolymorphicPtr<Value>>& value);
 
 	virtual void search(const MyString& key) const;
+	virtual void find(const MyString& key) const;
 	virtual void set(const MyString& path, const PolymorphicPtr<Value>& value);
-
-	virtual void write(std::ostream& os, size_t indent = 4) const = 0;
+	virtual void create(const MyString& path, const PolymorphicPtr<Value>& value);
+	virtual void write(std::ostream& os, size_t indent = 0) const = 0;
 
 	virtual ~Value() = default;
+
+	friend class Json;
 };

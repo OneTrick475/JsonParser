@@ -32,6 +32,8 @@ public:
 	char operator[](size_t index) const;
 
 	void trim();
+	bool isDouble() const;
+	double toDouble() const;
 	bool isNumber() const;
 	int toNumber() const;
 	size_t length() const;

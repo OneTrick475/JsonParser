@@ -304,6 +304,46 @@ bool MyString::isNumber() const {
 	return true;
 }
 
+bool MyString::isDouble() const {
+	bool firstDot = true;
+	for (size_t i = 0; i < length(); i++) {
+		if(firstDot && this->operator[](i) == '.') {
+			firstDot = false;
+			continue;
+		}
+		if (i == 0 && this->operator[](i) == '-')
+			continue;
+		if (this->operator[](i) < '0' || this->operator[](i) > '9')
+			return false;
+	}
+	return true;
+}
+
+double MyString::toDouble() const {
+	if (!isDouble())
+		throw std::logic_error("not a number");
+
+	double result = 0;
+	double multiplier = 1;
+	bool dotPassed = false;
+
+	for (size_t i = 0; i < length(); i++) {
+		if(this->operator[](i) == '.') {
+			dotPassed = true;
+			continue;
+		}
+		if (dotPassed) {
+			result += (this->operator[](length() - 1 - i) - '0') * multiplier;
+			multiplier *= 10;
+		}
+		else 
+			(result += (this->operator[](length() - 1 - i) - '0')) /= 10;
+		
+	}
+	return result;
+}
+
+
 std::istream& getline(std::istream& is, MyString& string, char delim) {
 	char buffer[1024];
 	is.getline(buffer, 1024, delim);

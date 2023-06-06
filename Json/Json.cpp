@@ -2,9 +2,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "BoolValue.h"
+#include "DoubleValue.h"
 #include "MyString.h"
-#include "JsonValue.h"
 #include "HashMap.hpp"
+#include "IntValue.h"
+#include "StringValue.h"
 
 Json::Json(const MyString& fileName) {
 	parse(fileName);
@@ -25,17 +28,17 @@ void Json::parse(const MyString& fileName) {
 	if (strcmp(buffer.c_str(), "{") != 0)
 		throw std::invalid_argument("Invalid Json file. Does not start with a '{' ");
 
-	readObject(file, map);
+	readObject(file, map.map);
 
 	file.close();
 
 	currentFile = fileName;
 }
 
-void Json::readObject(std::istream& file, HashMap<MyString, JsonValue, hash>& object) const {
+void Json::readObject(std::istream& file, HashMap<MyString, PolymorphicPtr<Value>, hash>& object) const {
 	while(true) {
 		MyString key;
-		JsonValue value;
+		PolymorphicPtr<Value> value;
 		if (!readPair(file, key, value))
 			break;
 		object.put(key, value);
@@ -61,13 +64,13 @@ void Json::readKey(MyString& buffer, MyString& str) const{
 
 }
 
-void Json::readVector(std::istream& file, Vector<JsonValue>& vector) const {
+void Json::readVector(std::istream& file, Vector<PolymorphicPtr<Value>>& vector) const {
 	MyString buffer;
 	getline(file, buffer, '\n');
 	buffer.trim();
 
 	while(strcmp(buffer.c_str(), "]") != 0) {
-		JsonValue value;
+		PolymorphicPtr<Value> value;
 		readValue(file, value, buffer);
 		vector.pushBack(value);
 		getline(file, buffer, '\n');
@@ -75,39 +78,54 @@ void Json::readVector(std::istream& file, Vector<JsonValue>& vector) const {
 	}
 }
 
-void Json::readValue(std::istream& file, JsonValue& value, MyString& buffer) const {
+void Json::readValue(std::istream& file, PolymorphicPtr<Value>& value, MyString& buffer) const {
 	if (buffer.c_str()[buffer.length() - 1] == ',')
 		buffer = MyString(buffer.c_str(), buffer.length() - 1);
 
-	if (buffer.isNumber())
-		value.setValue(buffer.toNumber());
+	if (buffer.isNumber()) {
+		value = new IntValue();
+		value->setValue(buffer.toNumber());
+	}
+
+	else if(buffer.isDouble()) {
+		value = new DoubleValue();
+		value->setValue(buffer.toDouble());
+	}
 
 	else if (buffer[0] == '{') {
-		HashMap<MyString, JsonValue, hash> object;
+		HashMap<MyString, PolymorphicPtr<Value>, hash> object;
 		readObject(file, object);
-		value.setValue(object);
+		value = new ObjectValue();
+		value->setValue(object);
 	}
 
 	else if (buffer[0] == '[') {
-		Vector<JsonValue> vector;
+		Vector<PolymorphicPtr<Value>> vector;
 		readVector(file, vector);
-		value.setValue(vector);
+		value = new VectorValue();
+		value->setValue(vector);
 	}
 
-	else if (buffer[0] == '"' && buffer[buffer.length() - 1] == '"')
-		value.setValue(MyString(&buffer.c_str()[1], buffer.length() - 2));
+	else if (buffer[0] == '"' && buffer[buffer.length() - 1] == '"') {
+		value = new StringValue();
+		value->setValue(MyString(&buffer.c_str()[1], buffer.length() - 2));
+	}
 
-	else if (strcmp(buffer.c_str(), "false") == 0)
-		value.setValue(false);
+	else if (strcmp(buffer.c_str(), "false") == 0) {
+		value = new BoolValue();
+		value->setValue(false);
+	}
 
-	else if (strcmp(buffer.c_str(), "true") == 0)
-		value.setValue(true);
+	else if (strcmp(buffer.c_str(), "true") == 0) {
+		value = new BoolValue();
+		value->setValue(true);
+	}
 
 	else
 		throw std::runtime_error("Invalid Json file.");
 }
 
-bool Json::readPair(std::istream& file, MyString& key, JsonValue& value) const {
+bool Json::readPair(std::istream& file, MyString& key, PolymorphicPtr<Value>& value) const {
 	MyString buffer;
 	getline(file, buffer, '\n');
 	buffer.trim();
@@ -124,19 +142,7 @@ bool Json::readPair(std::istream& file, MyString& key, JsonValue& value) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const Json& json) {
-	os << '{' << '\n';
-
-	bool isFirst = true;
-
-	for (HashMap<MyString, JsonValue, hash>::MapIterator it = json.map.begin(); it != json.map.end(); ++it) {
-		if (!isFirst) {
-			os << ",\n";
-		}
-		os <<  "  " << (*it).key << ": ";
-		(*it).value.write(os);
-		isFirst = false;
-	}
-	os << "\n}";
+	json.map.write(os);
 	return os;
 }
 
@@ -155,51 +161,31 @@ void Json::save(const MyString& path) const {
 
 void Json::search(const MyString& key) const {
 	std::cout << "[\n";
-	for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
-		if ((*it).key == key) {
-			(*it).value.write(std::cout);
-			std::cout << '\n';
-		}
-		(*it).value.search(key);
-	}
+	map.search(key);
 	std::cout << "]";
 }
 
 void Json::find(const MyString& key) const {
-	for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
-		if ((*it).key == key) {
-			std::cout << (*it).key << " : ";
-			(*it).value.write(std::cout);
-			std::cout << '\n';
-		}
-	}
+	map.find(key);
 }
 
 void Json::set(const MyString& path, const MyString& value) {
-	JsonValue val;
+	PolymorphicPtr<Value> val;
 	MyString buffer;
 	std::stringstream ss(value.c_str());
 	getline(ss, buffer, '\n');
 	readValue(ss, val, buffer);
 
-	size_t i = 0;
-	while (i < path.length() && path[i] != '/')
-		i++;
-	if(i == path.length()) {
-		for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
-			if ((*it).key == path) {
-				(*it).value = val;
-				return;
-			}
-		}
-		throw std::invalid_argument("Invalid path");
-	}
-	for (HashMap<MyString, JsonValue, hash>::MapIterator it = map.begin(); it != map.end(); ++it) {
-		if ((*it).key == path.substr(0, i)) {
-			(*it).value.set(&path.c_str()[i+1], val);
-			return;
-		}
-	}
-	throw std::invalid_argument("Invalid path");
+	map.set(path, val);
+}
+
+void Json::create(const MyString& path, const MyString& value) {
+	PolymorphicPtr<Value> val;
+	MyString buffer;
+	std::stringstream ss(value.c_str());
+	getline(ss, buffer, '\n');
+	readValue(ss, val, buffer);
+
+	map.create(path, val);
 }
 

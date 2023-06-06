@@ -35,6 +35,11 @@ void Value::set(const MyString& path, const PolymorphicPtr<Value>& value) {
 
 void Value::search(const MyString& key) const {}
 
+void Value::find(const MyString& key) const {}
+
+void Value::create(const MyString& path, const PolymorphicPtr<Value>& value) {
+	throw std::logic_error("invalid path");
+}
 
 
 

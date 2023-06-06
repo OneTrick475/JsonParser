@@ -46,8 +46,12 @@ public:
 	MapIterator end() const;
 
 	void put(keyType key, valueType value);
-	const valueType& get(const keyType& key) const;
+	const valueType& at(const keyType& key) const;
+	valueType& at(const keyType& key);
 	void remove(const keyType& key);
+
+	valueType& operator[](const keyType& key);
+	const valueType& operator[](const keyType& key) const;
 };
 
 
@@ -138,7 +142,7 @@ void HashMap<keyType, valueType, hashFunc>::put(keyType key, valueType value) {
 
 
 template <typename keyType, typename valueType, typename hashFunc>
-const valueType& HashMap<keyType, valueType, hashFunc>::get(const keyType& key) const {
+const valueType& HashMap<keyType, valueType, hashFunc>::at(const keyType& key) const {
 	size_t index = hash(key) % dataCapacity;
 
 	for(typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
@@ -146,7 +150,54 @@ const valueType& HashMap<keyType, valueType, hashFunc>::get(const keyType& key) 
 		if (pair.key == key)
 			return pair.value;
 	}
-	throw std::runtime_error("element doesnt exist");
+	throw std::range_error("key doesnt exist");
+}
+
+template <typename keyType, typename valueType, typename hashFunc>
+valueType& HashMap<keyType, valueType, hashFunc>::at(const keyType& key) {
+	size_t index = hash(key) % dataCapacity;
+
+	for (typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
+		Pair& pair = *it;
+		if (pair.key == key)
+			return pair.value;
+	}
+	throw std::range_error("key doesnt exist");
+}
+
+
+template <typename keyType, typename valueType, typename hashFunc>
+valueType& HashMap<keyType, valueType, hashFunc>::operator[](const keyType& key) {
+	size_t index = hash(key) % dataCapacity;
+
+	for (typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
+		Pair& pair = *it;
+		if (pair.key == key)
+			return pair.value;
+	}
+	put(key, valueType());
+	for (typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
+		Pair& pair = *it;
+		if (pair.key == key)
+			return pair.value;
+	}
+}
+
+template <typename keyType, typename valueType, typename hashFunc>
+const valueType& HashMap<keyType, valueType, hashFunc>::operator[](const keyType& key) const {
+	size_t index = hash(key) % dataCapacity;
+
+	for (typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
+		Pair& pair = *it;
+		if (pair.key == key)
+			return pair.value;
+	}
+	put(key, valueType());
+	for (typename LinkedList<Pair>::LinkedListIterator it = data[index].begin(); it != data[index].end(); ++it) {
+		Pair& pair = *it;
+		if (pair.key == key)
+			return pair.value;
+	}
 }
 
 
