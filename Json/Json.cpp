@@ -142,7 +142,7 @@ bool Json::readPair(std::istream& file, MyString& key, PolymorphicPtr<Value>& va
 }
 
 std::ostream& operator<<(std::ostream& os, const Json& json) {
-	json.map.write(os);
+	(& json.map)->write(os);
 	return os;
 }
 
@@ -161,12 +161,12 @@ void Json::save(const MyString& path) const {
 
 void Json::search(const MyString& key) const {
 	std::cout << "[\n";
-	map.search(key);
+	(&map)->search(key);
 	std::cout << "]";
 }
 
 void Json::find(const MyString& key) const {
-	map.find(key);
+	(&map)->find(key);
 }
 
 void Json::set(const MyString& path, const MyString& value) {
@@ -176,7 +176,7 @@ void Json::set(const MyString& path, const MyString& value) {
 	getline(ss, buffer, '\n');
 	readValue(ss, val, buffer);
 
-	map.set(path, val);
+	(&map)->set(path, val);
 }
 
 void Json::create(const MyString& path, const MyString& value) {
@@ -186,6 +186,13 @@ void Json::create(const MyString& path, const MyString& value) {
 	getline(ss, buffer, '\n');
 	readValue(ss, val, buffer);
 
-	map.create(path, val);
+	(&map)->create(path, val);
 }
 
+void Json::deletePath(const MyString& path) {
+	(&map)->deletePath(path);
+}
+
+void Json::moveFromTo(const MyString& origin, const MyString& dest) {
+	(&map)->moveFromTo(origin, dest);
+}

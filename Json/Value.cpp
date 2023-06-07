@@ -6,31 +6,31 @@ void Value::indent(std::ostream& os, size_t number) const {
 }
 
 void Value::setValue(bool value) {
-	throw std::logic_error("invalid type");
+	throw std::invalid_argument("invalid path");
 }
 
 void Value::setValue(const HashMap<MyString, PolymorphicPtr<Value>, hash>& _value) {
-	throw std::logic_error("invalid type");
+	throw std::invalid_argument("invalid path");
 }
 
 void Value::setValue(const MyString& value) {
-	throw std::logic_error("invalid type");
+	throw std::invalid_argument("invalid path");
 }
 
 void Value::setValue(const Vector<PolymorphicPtr<Value>>& value) {
-	throw std::logic_error("invalid type");
+	throw std::invalid_argument("invalid path");
 }
 
 void Value::setValue(double value) {
-	throw std::logic_error("invalid type");
+	throw std::invalid_argument("invalid path");
 }
 
 void Value::setValue(int value) {
-	throw std::logic_error("invalid type");
+	throw std::invalid_argument("invalid path");
 }
 
 void Value::set(const MyString& path, const PolymorphicPtr<Value>& value) {
-	throw std::logic_error("invalid path");
+	throw std::invalid_argument("invalid path");
 }
 
 void Value::search(const MyString& key) const {}
@@ -38,8 +38,25 @@ void Value::search(const MyString& key) const {}
 void Value::find(const MyString& key) const {}
 
 void Value::create(const MyString& path, const PolymorphicPtr<Value>& value) {
-	throw std::logic_error("invalid path");
+	throw std::invalid_argument("invalid path");
 }
+
+void Value::deletePath(const MyString& path) {
+	throw std::invalid_argument("invalid path");
+}
+
+void Value::moveFromTo(const MyString& origin, const MyString& dest) {
+	throw std::invalid_argument("invalid path");
+}
+
+PolymorphicPtr<Value>& Value::getDestFromPath(const MyString& path) {
+	throw std::invalid_argument("invalid path");
+}
+
+PolymorphicPtr<Value> Value::getOriginFromPath(const MyString& path) {
+	throw std::invalid_argument("invalid path");
+}
+
 
 
 

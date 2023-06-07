@@ -68,3 +68,101 @@ void ObjectValue::find(const MyString& key) const {
 	map.at(key)->write(std::cout);
 	std::cout << '\n';
 }
+
+void ObjectValue::create(const MyString& path, const PolymorphicPtr<Value>& value) {
+	size_t i = 0;
+	while (i < path.length() && path[i] != '/')
+		i++;
+
+	if (i == path.length()) {
+		try {
+			map.at(path);
+			throw std::invalid_argument("theres an element in this location");
+		}
+		catch (std::range_error& ex) {
+			map.put(path, value);
+			return;
+		}
+	}
+	try {
+		map.at(path.substr(0, i))->create(&path.c_str()[i + 1], value);
+	}
+	catch (std::range_error& ex) {
+		map[path.substr(0, i)] = PolymorphicPtr<Value>(new ObjectValue);
+		map[path.substr(0, i)]->create(&path.c_str()[i + 1], value);
+	}
+}
+
+void ObjectValue::deletePath(const MyString& path) {
+	size_t i = 0;
+	while (i < path.length() && path[i] != '/')
+		i++;
+
+	if (i == path.length()) {
+		try {
+			map.at(path);
+			map.remove(path);
+			return;
+		}
+		catch (std::range_error& ex) {
+			throw std::invalid_argument("invalid path");
+		}
+	}
+	try {
+		map.at(path.substr(0, i))->deletePath(&path.c_str()[i + 1]);
+	}
+	catch (std::range_error& ex) {
+		throw std::invalid_argument("invalid path");
+	}
+}
+
+PolymorphicPtr<Value>& ObjectValue::getDestFromPath(const MyString& path) {
+	size_t i = 0;
+	while (i < path.length() && path[i] != '/')
+		i++;
+
+	if (i == path.length()) {
+		try {
+			return map.at(path);
+		}
+		catch (std::range_error& ex) {
+			throw std::invalid_argument("invalid path");
+		}
+	}
+	try {
+		return map.at(path.substr(0, i))->getDestFromPath(&path.c_str()[i + 1]);
+	}
+	catch (std::range_error& ex) {
+		throw std::invalid_argument("invalid path");
+	}
+}
+
+PolymorphicPtr<Value> ObjectValue::getOriginFromPath(const MyString& path) {
+	size_t i = 0;
+	while (i < path.length() && path[i] != '/')
+		i++;
+
+	if (i == path.length()) {
+		try {
+			PolymorphicPtr<Value> value = ((const HashMap<MyString, PolymorphicPtr<Value>, hash>)map).at(path);
+			map.remove(path);
+			return value;
+		}
+		catch (std::range_error& ex) {
+			throw std::invalid_argument("invalid path");
+		}
+	}
+	try {
+		return map.at(path.substr(0, i))->getOriginFromPath(&path.c_str()[i + 1]);
+	}
+	catch (std::range_error& ex) {
+		throw std::invalid_argument("invalid path");
+	}
+}
+
+
+void ObjectValue::moveFromTo(const MyString& origin, const MyString& dest) {
+	PolymorphicPtr<Value>& destValue = getDestFromPath(dest);
+	PolymorphicPtr<Value> originValue = getOriginFromPath(origin);
+	destValue = originValue;
+}

@@ -6,6 +6,9 @@
 class Value {
 protected:
 	void indent(std::ostream& os, size_t number) const;
+
+	virtual PolymorphicPtr<Value>& getDestFromPath(const MyString& path);
+	virtual PolymorphicPtr<Value> getOriginFromPath(const MyString& path);
 public:
 	virtual Value* clone() const = 0;
 
@@ -20,9 +23,12 @@ public:
 	virtual void find(const MyString& key) const;
 	virtual void set(const MyString& path, const PolymorphicPtr<Value>& value);
 	virtual void create(const MyString& path, const PolymorphicPtr<Value>& value);
-	virtual void write(std::ostream& os, size_t indent = 0) const = 0;
+	virtual void write(std::ostream& os, size_t indent = 2) const = 0;
+	virtual void deletePath(const MyString& path);
+	virtual void moveFromTo(const MyString& origin, const MyString& dest);
 
 	virtual ~Value() = default;
 
 	friend class Json;
+	friend class ObjectValue;
 };

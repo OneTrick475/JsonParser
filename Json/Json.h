@@ -24,6 +24,8 @@ public:
 	void find(const MyString& key) const;
 	void set(const MyString& path, const MyString& value);
 	void create(const MyString& path, const MyString& value);
+	void deletePath(const MyString& path);
+	void moveFromTo(const MyString& origin, const MyString& dest);
 
 	void parse(const MyString& fileName);
 	void print() const;

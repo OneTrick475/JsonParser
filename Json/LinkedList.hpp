@@ -51,8 +51,6 @@ public:
 
 	template<typename T>
 	friend std::ostream& operator<<(std::ostream& os, const LinkedList<T>& ll);
-
-	friend class JsonHashMap;
 };
 
 template <typename T>
