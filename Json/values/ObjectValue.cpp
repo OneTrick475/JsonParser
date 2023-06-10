@@ -18,12 +18,12 @@ void ObjectValue::write(std::ostream& os, size_t _indent) const {
 			os << ",\n";
 		}
 		indent(os, _indent);
-		os << (*it).key << ": ";
+		os << "\"" << (*it).key << "\"" << ": ";
 		(*it).value->write(os, _indent + 2);
 		isFirst = false;
 	}
 	os << "\n";
-	indent(os, _indent);
+	indent(os, _indent - 2);
 	os << '}';
 }
 
@@ -116,6 +116,28 @@ void ObjectValue::deletePath(const MyString& path) {
 	}
 }
 
+const PolymorphicPtr<Value>& ObjectValue::getAt(const MyString& path) const {
+	size_t i = 0;
+	while (i < path.length() && path[i] != '/')
+		i++;
+
+	if (i == path.length()) {
+		try {
+			return map.at(path);
+		}
+		catch (std::range_error& ex) {
+			throw std::invalid_argument("invalid path");
+		}
+	}
+	try {
+		return map.at(path.substr(0, i))->getAt(&path.c_str()[i + 1]);
+	}
+	catch (std::range_error& ex) {
+		throw std::invalid_argument("invalid path");
+	}
+}
+
+
 PolymorphicPtr<Value>& ObjectValue::getDestFromPath(const MyString& path) {
 	size_t i = 0;
 	while (i < path.length() && path[i] != '/')
@@ -166,3 +188,13 @@ void ObjectValue::moveFromTo(const MyString& origin, const MyString& dest) {
 	PolymorphicPtr<Value> originValue = getOriginFromPath(origin);
 	destValue = originValue;
 }
+
+void ObjectValue::writeAt(std::ostream& os, const MyString& path, size_t indent) const{
+	if (strcmp(path.c_str(), "\0") == 0) {
+		this->write(os);
+		return;
+	}
+
+	getAt(path)->write(os);
+}
+

@@ -1,6 +1,6 @@
 #pragma once
 #include "Value.h"
-#include "MyString.h"
+#include "../MyString.h"
 
 class StringValue : public Value {
 	MyString string;

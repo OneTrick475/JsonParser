@@ -1,7 +1,7 @@
 #pragma once
-#include "HashMap.hpp"
-#include "MyString.h"
-#include "PolymorphicPtr.hpp"
+#include "../data structures/HashMap.hpp"
+#include "../MyString.h"
+#include "../PolymorphicPtr.hpp"
 
 class Value {
 protected:
@@ -9,6 +9,8 @@ protected:
 
 	virtual PolymorphicPtr<Value>& getDestFromPath(const MyString& path);
 	virtual PolymorphicPtr<Value> getOriginFromPath(const MyString& path);
+
+	virtual const PolymorphicPtr<Value>& getAt(const MyString& path) const;
 public:
 	virtual Value* clone() const = 0;
 

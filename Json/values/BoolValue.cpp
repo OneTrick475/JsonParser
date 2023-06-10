@@ -5,7 +5,7 @@ Value* BoolValue::clone() const {
 }
 
 void BoolValue::write(std::ostream& os, size_t indent) const {
-	os << _bool;
+	os << std::boolalpha << "\"" << _bool << "\"";
 }
 
 void BoolValue::setValue(bool value) {

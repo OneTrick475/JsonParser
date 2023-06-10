@@ -57,7 +57,8 @@ PolymorphicPtr<Value> Value::getOriginFromPath(const MyString& path) {
 	throw std::invalid_argument("invalid path");
 }
 
-
-
+const PolymorphicPtr<Value>& Value::getAt(const MyString& path) const {
+	throw std::invalid_argument("invalid path");
+}
 
 

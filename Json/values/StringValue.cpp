@@ -9,7 +9,7 @@ void StringValue::setValue(const MyString& value) {
 }
 
 void StringValue::write(std::ostream& os, size_t indent) const {
-	os << string;
+	os << "\"" << string << "\"";
 }
 
 
