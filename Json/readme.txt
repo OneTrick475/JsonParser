@@ -84,6 +84,8 @@ If the file cant be opened a runtime_error is thrown and if the value path is in
 
 for both print and save, the json will be in the correct format described above and it will also have proper indentation to make it readable
 
-
 For the data structures - functions that were not required for the project might be missing
 
+
+side note: Initially planned to make the JsonValue one class containing a union(can be seen in older commits) and it was fine but I decided to change it to a polymorphic value,
+since this is what we did in lectures
