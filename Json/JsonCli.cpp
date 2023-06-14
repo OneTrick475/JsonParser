@@ -17,6 +17,10 @@ void JsonCli::run() {
 			std::cout << ex.what() << std::endl;
 		}catch(std::runtime_error& ex) {
 			std::cout << ex.what() << std::endl;
+		}catch(std::exception& ex) {
+			std::cout << ex.what() << std::endl;
+		}catch(...) {
+			std::exit(1);
 		}
 		delete command;
 	}

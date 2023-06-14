@@ -22,7 +22,7 @@ ObjectValue JsonParser::parse(const MyString& fileName){
 	buffer.trim();
 
 	if (strcmp(buffer.c_str(), "{") != 0)
-		throw std::invalid_argument("Invalid Json file. Does not start with a '{' ");
+		throw std::invalid_argument("Invalid Json format. Does not start with a '{' ");
 
 	readObject(file, map.map);
 
@@ -51,10 +51,10 @@ void JsonParser::readKey(MyString& buffer, MyString& str){
 	buffer.trim();
 
 	if (key[0] != '"')
-		throw std::invalid_argument("Invalid Json file. A string did not start with \" ");
+		throw std::invalid_argument("Invalid Json format. A string did not start with \" ");
 
 	if (key[key.length() - 1] != '"')
-		throw std::invalid_argument("Invalid Json file. A string did not end with \" ");
+		throw std::invalid_argument("Invalid Json format. A string did not end with \" ");
 
 	str = MyString(&key.c_str()[1], key.length() - 2); // we want to skip the first  "  and the  "  at the end
 }
@@ -117,7 +117,7 @@ void JsonParser::readValue(std::istream& file, PolymorphicPtr<Value>& value, MyS
 	}
 
 	else
-		throw std::runtime_error("Invalid Json file.");
+		throw std::invalid_argument("Invalid Json format.");
 }
 
 bool JsonParser::readPair(std::istream& file, MyString& key, PolymorphicPtr<Value>& value){
