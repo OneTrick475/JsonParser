@@ -1,5 +1,7 @@
 Json Parser
 
+In case of unresolved externels - rebuild solution
+
 The project can function both as a library and a cli but is built with the intention of it working like a library. The cli is just for easier testing and to implement the command pattern.
 Trying to break the cli with invalid input might cause undefined behaviour. 
 Trying to break the functions with invalid arguments will cause a proper exception to be thrown. The exception will have a message containing information about the error.

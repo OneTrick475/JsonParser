@@ -45,7 +45,7 @@ public:
 	MapIterator begin() const;
 	MapIterator end() const;
 
-	void put(keyType key, valueType value);
+	void put(const keyType& key, const valueType& value);
 	const valueType& at(const keyType& key) const;
 	valueType& at(const keyType& key);
 	void remove(const keyType& key);
@@ -121,7 +121,7 @@ typename HashMap<keyType, valueType, hashFunc>::MapIterator HashMap<keyType, val
 }
 
 template<typename keyType, typename valueType, typename hashFunc>
-void HashMap<keyType, valueType, hashFunc>::put(keyType key, valueType value) {
+void HashMap<keyType, valueType, hashFunc>::put(const keyType& key, const valueType& value) {
 	size_t index = hash(key) % dataCapacity;
 
 	if (data[index].isEmpty()) {
@@ -139,7 +139,6 @@ void HashMap<keyType, valueType, hashFunc>::put(keyType key, valueType value) {
 
 	data[index].add(Pair(key, value));
 }
-
 
 template <typename keyType, typename valueType, typename hashFunc>
 const valueType& HashMap<keyType, valueType, hashFunc>::at(const keyType& key) const {
